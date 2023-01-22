@@ -1,0 +1,3 @@
+# Files ususally too large
+*.npy
+*.pkl
