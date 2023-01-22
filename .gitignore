@@ -1,3 +1,11 @@
 # Files ususally too large
 *.npy
 *.pkl
+
+# Environment files
+exocomet/
+
+__pycache__/
+
+# Jupyter Notebook
+.ipynb_checkpoints
