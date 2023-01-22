@@ -1,3 +1,7 @@
 matplotlib
+ipykernel
 numpy
 pandas
+astropy
+# jupyterlab
+# ipympl
