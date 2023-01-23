@@ -57,11 +57,11 @@ class GetSpectra():
         if os.path.exists(w_path) == False:
             os.mkdir(w_path)
         
-            np.save(w_path + 'wK.npy', self.wK)
-            np.save(w_path + 'rvK.npy', self.rvK)
+        np.save(w_path + 'wK.npy', self.wK)
+        np.save(w_path + 'rvK.npy', self.rvK)
 
-            np.save(w_path + 'wH.npy', self.wH)
-            np.save(w_path + 'rvH.npy', self.rvH)
+        np.save(w_path + 'wH.npy', self.wH)
+        np.save(w_path + 'rvH.npy', self.rvH)
 
     def update_archive(self, index, file, keys, df):
         lines = [self.CaIIH, self.CaIIK]
