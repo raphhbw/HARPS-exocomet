@@ -5,15 +5,17 @@ Makes a folder for each group - named by most common reduced name in group
 '''
 import pandas as pd
 import numpy as np
-import os, sys
+import os, sys, glob
 from statistics import mode
 
 
 # Load metadata + spectra
 metadata = pd.read_pickle('../build-dataset/res/meta/full_metadata.pkl')
-sK = np.load('../build-dataset/res-21-03-22/spec/sK.npy')
-sH = np.load('../build-dataset/res-21-03-22/spec/sH.npy')
-fits_list = np.load('../build-dataset/res/fits_list.npy')
+sK = np.load('../build-dataset/res/spec/sK.npy')
+sH = np.load('../build-dataset/res/spec/sH.npy')
+fits_list = np.array(sorted(glob.glob('../fits/ADP.*.fits')))
+# print(fits_list)
+# fits_list = np.load('../build-dataset/res/fits_list.npy')
 wH = np.load('../build-dataset/res/wavelengths/wH.npy')
 wK = np.load('../build-dataset/res/wavelengths/wK.npy')
 rvH = np.load('../build-dataset/res/wavelengths/rvH.npy')

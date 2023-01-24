@@ -1,7 +1,7 @@
 '''
 Updated 24-01-2023
 
-Create Groups for every individual targets
+Form groups for every individual targets
 '''
 import pandas as pd
 import numpy as np
@@ -31,7 +31,6 @@ groups = redu_coords['Groups'].apply(lambda g: g.values[0] if (len(g)>1) else g.
 groups = groups.rename(columns={'Groups': 'New Groups'})
 
 ### Map back the group number to metadata ###
-
 group_redu = reduced.join(groups.set_index(['Alpha', 'Delta']), on=['Alpha', 'Delta'])
 
 meta = metadata.copy() # keep metadata authentic
@@ -39,6 +38,6 @@ full = meta.join(group_redu.set_index('Reduced')['New Groups'], on= 'Reduced')
 full = full.drop(columns=['Nb Obs'])
 
 # print(np.array_equal(full.Object.to_numpy(), metadata.Object.to_numpy()))
-# print(full)
+print(full)
 full.to_pickle('../build-dataset/res/meta/full_metadata.pkl')
 group_redu.to_pickle('../build-dataset/res/meta/groups.pkl')
