@@ -10,14 +10,14 @@ from statistics import mode
 
 
 # Load metadata + spectra
-metadata = pd.read_pickle('../build-dataset/res-21-03-22/meta/full_metadata.pkl')
+metadata = pd.read_pickle('../build-dataset/res/meta/full_metadata.pkl')
 sK = np.load('../build-dataset/res-21-03-22/spec/sK.npy')
 sH = np.load('../build-dataset/res-21-03-22/spec/sH.npy')
-fits_list = np.load('../build-dataset/res-21-03-22/fits_list-21-03.npy')
-wH = np.load('../build-dataset/res-21-03-22/wavelengths/wH.npy')
-wK = np.load('../build-dataset/res-21-03-22/wavelengths/wK.npy')
-rvH = np.load('../build-dataset/res-21-03-22/wavelengths/rvH.npy')
-rvK = np.load('../build-dataset/res-21-03-22/wavelengths/rvK.npy')
+fits_list = np.load('../build-dataset/res/fits_list.npy')
+wH = np.load('../build-dataset/res/wavelengths/wH.npy')
+wK = np.load('../build-dataset/res/wavelengths/wK.npy')
+rvH = np.load('../build-dataset/res/wavelengths/rvH.npy')
+rvK = np.load('../build-dataset/res/wavelengths/rvK.npy')
 print('metadata + spectra + wavelengths loaded')
 
 groups = pd.unique(metadata['New Groups'])
