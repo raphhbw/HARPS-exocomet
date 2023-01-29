@@ -5,6 +5,7 @@ Form groups for every individual targets
 '''
 import pandas as pd
 import numpy as np
+from statistics import mode
 
 # Load metadata + spectra
 metadata = pd.read_pickle('../build-dataset/res/meta/metadata.pkl')
@@ -21,6 +22,7 @@ r = metadata.groupby(['Reduced'], as_index=False)
 metadata['Nb Obs'] = np.zeros(len(metadata))
 agg_func_count = {'Alpha': 'median', 'Delta': 'median', 'Nb Obs':'count'}
 reduced = r.agg(agg_func_count)
+
 reduced.insert(0, 'Groups', np.arange(len(reduced)))
 
 # Group the reduced name by coordinates -ie. Alpha, Delta (groupby object)
@@ -37,7 +39,21 @@ meta = metadata.copy() # keep metadata authentic
 full = meta.join(group_redu.set_index('Reduced')['New Groups'], on= 'Reduced')
 full = full.drop(columns=['Nb Obs'])
 
-# print(np.array_equal(full.Object.to_numpy(), metadata.Object.to_numpy()))
+# Get all information for all the different groups
+full_grouped = full.groupby('New Groups')
+
+all_groups = full_grouped.first() # df to be updated with new data
+all_groups['Sanitised'] = full_grouped['Sanitised'].apply(lambda san: mode(san))
+all_groups['Reduced'] = full_grouped['Reduced'].apply(lambda red: mode(red))
+all_groups['Object'] = full_grouped['Object'].apply(lambda obj: mode(obj))
+all_groups['Alpha'] = full_grouped['Alpha'].apply(lambda alph: mode(alph))
+all_groups['Delta'] = full_grouped['Delta'].apply(lambda delt: mode(delt))
+
+
+all_groups = all_groups.drop(columns=['SNR','Date', 'RV', 'Checked', 'Coordtype',	'Epoch',	'Epochsystem',	'Equinox',	'Parallax',	'PM Alpha',	'PM Delta',	'Airmass',	'RA',	'Dec' ])
+all_groups = all_groups.reset_index(drop =False)
+
 print(full)
+print(all_groups)
 full.to_pickle('../build-dataset/res/meta/full_metadata.pkl')
-group_redu.to_pickle('../build-dataset/res/meta/groups.pkl')
+all_groups.to_pickle('../build-dataset/res/meta/groups.pkl')
