@@ -13,7 +13,7 @@ import json, argparse
 startTime = time.time()
 
 parser = argparse.ArgumentParser(description='How to use QuickSearch', epilog='ASSET by RBW')
-parser.add_argument('--p', metavar='param.json', default='param.json', help='parameter file name (default:param/param.json)')
+parser.add_argument('--p', metavar='param.json', default='param.json', help='parameter file name (default:param.json)')
 parser.add_argument('--nice', metavar='niceness', default=15, help='niceness of job (default: 15)')
 args = parser.parse_args()
 
@@ -30,11 +30,11 @@ with multiprocessing.Pool(param["cores"]) as pool:
     out = pool.map(Search.quicksearch, dataset_path)
 
 output = np.array(out)
+print(output)
 
 cands = output[output != None]
 
-cands_file = 'candidates_{}_{}_{}sig_{}med_{}cut_width{}.npy'.format(Search.rv_min, Search.rv_max,
-                Search.threshold, Search.pts_filter, Search.cutoff, Search.width_filter)
+cands_file = 'candidates_{}sig_{}cut_{}width.npy'.format(Search.threshold, Search.cutoff, Search.width_filter)
 
 # cands_file = 'old_noise_filtering.npy'
 
@@ -42,3 +42,4 @@ np.save('../results/QuickSearch/' + cands_file, cands)
 
 executionTime = (time.time() - startTime)
 print('Execution time in seconds: ' + str(executionTime))
+# print('Number of stars with <= 1 spectrum:', Search.count_df_1)

@@ -36,8 +36,9 @@ with open(args.p) as paramfile:
 if str(args.star) != 'None':
     target = to_reduce(str(args.star))
     try:
-        candidates = find_target(target)
-        print('The star {} is observed by HARPS.'.format(candidates.Sanitised))
+        cand_info = find_target(target)
+        candidates = [cand_info.Reduced]
+        print('The star {} is observed by HARPS.'.format(cand_info.Sanitised))
         single_star = True
     except FileNotFoundError:
         print('The star {} ({}) does not exist. Try again!'.format(str(args.star), target))
@@ -45,10 +46,7 @@ if str(args.star) != 'None':
 else:
     # Input candidate list
     if str(args.cands) == 'False':
-        # candidates = np.load('stats/new_cands.npy')
-        # candidates = np.load('QuickSearch/new_noise_filtering.npy', allow_pickle=True)
-        candidates = np.load('time-filter/time-filtered-cands.npy', allow_pickle=True)
-        # review_cands = False
+        candidates = np.load('../results/QuickSearch/candidates_-4sig_1.2cut_3width.npy', allow_pickle = True)
     else:
         # review_cands = True
         # TODO load candidate numpy array
@@ -62,14 +60,11 @@ else:
 # old_report = pd.read_pickle('CandidateReport/old_candidate_report.pkl')
 # newest_report = pd.read_pickle('CandidateReport2/candidate_report.pkl')
 
-
-review_flagged = True
-# look_skip = None # Flag to note if user wants to review skipped targets
-# look_flagged = None # Flag to note if user wants to review flagged targets
-
 Search = ASSET(param)
 HRd = HR_Diagram()
 Classifier = Classify(param, args.r)
+
+review_flagged = True
 
 while review_flagged == True:
     look_flagged = None # Flag to note if user wants to review flagged targets
@@ -164,7 +159,7 @@ while review_flagged == True:
                 ax2.set_ylabel('Normalised Flux')
                 ax2.set_xlabel('Heliocentric Velocity (km/s)')
                 ax2.set_xlim(Search.rv_min,Search.rv_max)
-                # ax2.set_ylim(top = 1.2)
+                # ax2.set_ylim(top = 1.2, bottom=-0.1)
 
                 # ax3.set_xlim(Search.rv_min,Search.rv_max)
                 ax3.set_ylabel('SNR ($\sigma$)')
@@ -176,17 +171,17 @@ while review_flagged == True:
                 ax4.set_ylabel('min SNR ($\sigma$)')
                 ax4.set_xlabel('Heliocentric Velocity (km/s)')
 
-                all_gaia_colours, all_gaia_Mag = HRd.build_HR(HRd.gaia_xmatch)
+                all_gaia_colours, all_gaia_Mag = HRd.build_HR(HRd.gaia_xmatch, adjust=False)
                 target_gaia_info = HRd.get_star_gaia_info(Search.target_red)
-                target_gaia_colours, target_gaia_Mag = HRd.build_HR(target_gaia_info)
+                target_gaia_colours, target_gaia_Mag = HRd.build_HR(target_gaia_info, adjust = False)
 
                 ax5.scatter(all_gaia_colours, all_gaia_Mag, s=20, marker = 'o', color = 'grey', alpha = 0.5)
                 ax5.scatter(target_gaia_colours, target_gaia_Mag, s=20, marker = 's', color = 'blue')
 
                 ax5.set_ylabel('Gaia Absolute Magnitude')
                 ax5.set_xlabel('Gaia G-Rp Colour')
-                ax5.set_xlim((-0.3, 1.5))
-                ax5.set_ylim((10,30))
+                ax5.set_xlim((-0.4, 1.5))
+                ax5.set_ylim((-9,15))
                 ax5.invert_yaxis()
                 ax5.yaxis.set_minor_locator(AutoMinorLocator())
                 ax5.xaxis.set_minor_locator(AutoMinorLocator())
@@ -275,7 +270,7 @@ while review_flagged == True:
                     # ax3.plot(Search.rv_K, snr/sd, linewidth =1) # plots whole idxrange
     
                 ax2.plot(Search.rv_K, corr_med, linewidth = 2.5,color = 'r', label='Median reference spectrum', zorder = 10)
-                ax2.fill_between(Search.rv_K, corr_med - med_err, corr_med + med_err, color='red', alpha=0.3)
+                # ax2.fill_between(Search.rv_K, corr_med - med_err, corr_med + med_err, color='red', alpha=0.3)
                 if Search.ccf:
                     ax2.plot(Search.rv_K, med, linewidth = 2.5,color = 'r', linestyle = '--', alpha =0.2, label='Original Median reference spectrum', zorder = 0)
                 ax2.legend()
@@ -332,10 +327,6 @@ while review_flagged == True:
             
             plt.close(fig)
 
-            # if i+1 % 20 == 0:
-            #     print('Saving progress...')
-            #     Classifier.candidate_report.to_pickle(Classifier.cand_report_path)
-            #     print('Saved!')
         if str(args.savefig) != 'None':
             sys.exit()
 

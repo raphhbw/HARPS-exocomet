@@ -128,3 +128,4 @@ class Classify():
 
         if event.key == 'o':
             print(self.detection_info[self.print_columns_o])
+            # self.detection_info[self.print_columns_o].to_pickle('stats/betapic-detections.pkl') # special betapic case

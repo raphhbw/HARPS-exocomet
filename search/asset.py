@@ -34,6 +34,8 @@ class ASSET():
         self.rv_K = None
 
         self.snr_idxrange_K = None
+        
+        # self.count_df_1 = 0 #Count the number of stars that have <= 1 spectrum
 
         self.ccf = False #By default ccf flag is off - activated when act_cutoff on
 
@@ -143,6 +145,9 @@ class ASSET():
         self.load_info(star)
 
         if len(self.df) <= 1:
+            # self.count_df_1 += 1
+            # print('not enough spectra!')
+            # print(self.count_df_1)
             return None
 
         if snr_filt == True:
@@ -163,7 +168,7 @@ class ASSET():
         filtered_med = med[cond]
 
         if len(np.where(filtered_med > self.cutoff)[0]) > 0: #Changed to cutoff when MED (not spectrum) is >cutoff
-            self.ccf = True
+            self.ccf = True # Flag changed to No CCF
             # return None
         # else:
         #     return None
@@ -243,4 +248,3 @@ class ASSET():
                     return self.target_red
         
         return None
-        
