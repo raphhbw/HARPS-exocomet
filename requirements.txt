@@ -6,3 +6,4 @@ astropy
 # jupyterlab
 # ipympl
 astroquery
+scipy
