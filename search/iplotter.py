@@ -22,6 +22,7 @@ from classifier import Classify
 parser = argparse.ArgumentParser(description='Automatic Spectroscopy Search for Exocomet Transits Tutorial', epilog='ASSET by RBW')
 parser.add_argument('--p', metavar='param.json', default='param.json', help='parameter file name (default:input_param.json)')
 parser.add_argument('--star', metavar='star', default='None', help='Individual star you want to look at')
+# parser.add_argument('--force', metavar='force_star', default='None', help='Force star you want to look at - input dataset name')
 parser.add_argument('--nice', metavar='niceness', default=15, help='niceness of job (default: 15)')
 parser.add_argument('--cands', metavar='review_cands', default='False', help='review previously flagged as candidates (default: False)')
 parser.add_argument('--r', metavar='res-path', default='../results/CandidateReport/', help='path for candidate report (default: CandidateReport/)')
@@ -43,6 +44,9 @@ if str(args.star) != 'None':
     except FileNotFoundError:
         print('The star {} ({}) does not exist. Try again!'.format(str(args.star), target))
         sys.exit()
+elif str(args.force) != 'None':
+    candidates = [str(args.force)]
+    single_star = True
 else:
     # Input candidate list
     if str(args.cands) == 'False':

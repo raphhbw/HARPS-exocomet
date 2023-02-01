@@ -1,5 +1,5 @@
 {
-	"threshold": -3,
+	"threshold": -4,
     "med_filter_bin": 3,
     "rv_min": -200,
     "rv_max": 200,
