@@ -10,12 +10,9 @@ An exocomet detection in spectroscopy is identified by variable absorption featu
 **Data used**: Entire [HARPS archive](http://archive.eso.org/wdb/wdb/adp/phase3_main/form) (from 21/03/2022)  
 **Goal**: Estimate the frequency of observing exocomet transits in spectroscopy (CaII K line)
 
-**Install dependencies**
+**List of dependencies**
 ---
-```shell
-conda create --name exocomet --file requirements.txt
-conda activate exocomet
-```
+All package dependencies can be found listed in `requirements.txt`.
 
 **How to run**
 ---
