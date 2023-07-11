@@ -1,11 +1,11 @@
 {
 	"threshold": -4,
     "med_filter_bin": 3,
-    "rv_min": -200,
-    "rv_max": 200,
+    "rv_min": -700,
+    "rv_max": 700,
     "cutoff": 1.2,
     "width_filt": 3,
-    "dataset": "../dataset/",
+    "dataset": "../HARPS-dataset/",
     "SNR_cut": 10,
     "cores": 10
 }
