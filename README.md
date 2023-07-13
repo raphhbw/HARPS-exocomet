@@ -19,7 +19,7 @@ All package dependencies can be found listed in `requirements.txt`.
 _build-dataset_:  
 1. `metadata.py` - saves metadata from fits files in `fits` folder, using `GetData.py`
 2. `spectra.py` - saves spectra from fits files in `fits` folder for specified atomic line (CaII H & K lines), using `GetData.py`. +/- 2000 points from atomic line is saved
-3. `santise_reduce.py` - cleans up the name of the observed targets to facilitate grouping (eg. 'reduced' name is all lower case and underscore, dashes, spaces are removed)
+3. `sanitise_reduce.py` - cleans up the name of the observed targets to facilitate grouping (eg. 'reduced' name is all lower case and underscore, dashes, spaces are removed)
 
 _groups_:  
 1.  `grouping.py` - group observed targets by 'reduced' name and coordinates  

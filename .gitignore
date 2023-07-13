@@ -1,6 +1,6 @@
 # Files ususally too large
-# *.npy
-# *.pkl
+*.npy
+*.pkl
 
 # Environment files
 exocomet/

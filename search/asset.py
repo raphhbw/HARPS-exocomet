@@ -33,6 +33,11 @@ class ASSET():
         self.rv_H = None
         self.rv_K = None
 
+        self.tot_err_spec = []
+        self.tot_spec = []
+
+        self.ok = []
+
         self.snr_idxrange_K = None
         
         # self.count_df_1 = 0 #Count the number of stars that have <= 1 spectrum
@@ -58,6 +63,7 @@ class ASSET():
         self.target_harps = mode(self.df.Object)
 
         self.sK = np.load(star_path+'spec/sK.npy')
+        # self.tot += len(self.sK)
 
         self.w_H = np.load(star_path + 'wavelength/wH.npy')
         self.w_K = np.load(star_path + 'wavelength/wK.npy')
@@ -67,6 +73,7 @@ class ASSET():
 
         if init == True:
             self.snr_idxrange_K = np.where((self.rv_K > self.rv_min) & (self.rv_K < self.rv_max))
+            # print(self.snr_idxrange_K)
 
     def snr_cutoff(self):
         snr = self.df.SNR.to_numpy()
@@ -84,30 +91,45 @@ class ASSET():
 
     def noise_cut(self, spec):
         ref, _ = self.ref(spec)
-        cutoff = np.median(ref) * 0.25
+        # print(ref.shape)
+        new_ref = ref[self.ok]
+        # print(new_ref)
+        new_spectrum = spec[:,self.ok]
+        # print(new_ref.shape, new_spectrum.shape)
 
-        self.spec_err(ref, spec)
+        cutoff = np.median(new_ref) * 0.25
+
+        self.spec_err(new_ref, new_spectrum)
+        # print(self.err_sK.shape)
         new = spec[self.err_sK <= cutoff]
         self.df = self.df[self.err_sK <= cutoff].reset_index(drop = True)
+
+        # cutoff = np.median(ref) * 0.25
+
+        # self.spec_err(ref, spec)
+        # new = spec[self.err_sK <= cutoff]
+        # self.df = self.df[self.err_sK <= cutoff].reset_index(drop = True)
         return new        
 
     def norm(self,rv,s):
         ''' Normalise the input spectrum array
         Returns array same shape as input
         '''
-        ok = []
+        self.ok = []
         norm_s = np.zeros_like(s)
         
         for i in range(len(rv)): #Finding indices of values in the conditions
-            if rv[i] < -100:
-                ok.append(i)
-            if rv[i] > 100:
-                ok.append(i)
+            # if rv[i] < -100:
+            if rv[i] < -200:
+                self.ok.append(i)
+            if rv[i] > 200:
+            # if rv[i] > 100:
+                self.ok.append(i)
             continue
         
         for i in range(len(s)): #Normalising all spectra
             spec = s[i,:]
-            mean = np.mean(spec[ok])
+            mean = np.mean(spec[self.ok])
             norm_s[i,:] = spec/mean
         
         return norm_s
@@ -157,7 +179,15 @@ class ASSET():
         new_sK = self.smoothing(norm_sK, self.pts_filter)
 
         # new_sK = self.std_cutoff(new_sK)
+
+        # before = len(new_sK)
+        # self.tot_spec.append(before)
         new_sK = self.noise_cut(new_sK)
+        # self.tot_err_spec.append(before - len(new_sK))
+        # print(before, before - len(new_sK))
+        # print(np.array(self.tot_spec).sum(), np.array(self.tot_err_spec).sum())
+
+        # return [before - len(new_sK), None]
 
         if len(self.df) <= 1:
             return None
@@ -169,6 +199,7 @@ class ASSET():
 
         if len(np.where(filtered_med > self.cutoff)[0]) > 0: #Changed to cutoff when MED (not spectrum) is >cutoff
             self.ccf = True # Flag changed to No CCF
+            
             # return None
         # else:
         #     return None
@@ -201,6 +232,8 @@ class ASSET():
         self.ccf = False
         spec_param = self.spec_analysis(star)
 
+        # if spec_param[1] == None:
+        #     return spec_param[0]
         if spec_param == None:
             return None
         else:
@@ -243,6 +276,7 @@ class ASSET():
             min_detect = np.nanmin(sig)
 
             if min_detect < self.threshold:
+                # print('detection----------------------')
                 width = self.get_width(sig)
                 if width >= self.width_filter:
                     return self.target_red
