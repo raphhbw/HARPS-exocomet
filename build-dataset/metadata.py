@@ -6,7 +6,7 @@ import glob
 input_fits_path = "../fits/"
 
 file_list = sorted(glob.glob(input_fits_path + 'ADP.*.fits'))
-# np.save('fits_list.npy', file_list)
+np.save('fits_list.npy', file_list)
 
 allkeys = ['OBJECT', 'HIERARCH ESO TEL TARG ALPHA', 'HIERARCH ESO TEL TARG DELTA', 'SNR', 'DATE-OBS',
         'HIERARCH ESO TEL TARG RADVEL', 'HIERARCH ESO TEL TARG COORDTYPE', 'HIERARCH ESO TEL TARG EPOCH',
