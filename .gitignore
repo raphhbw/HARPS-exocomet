@@ -4,6 +4,7 @@
 
 .DS_Store
 __pycache__/
+HARPS-dataset/
 
 # Jupyter Notebook
 .ipynb_checkpoints

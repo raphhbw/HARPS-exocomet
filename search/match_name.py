@@ -7,7 +7,8 @@ def find_target(star):
     group_df = metadata[metadata['Reduced'] == star].reset_index(drop = True)
 
     if len(group_df) > 0:
-        return group_dependency.loc[group_df['New Groups'][0]]
+        # return group_dependency.loc[group_df['New Groups'][0]]
+        return group_dependency.set_index('New Groups').loc[group_df['New Groups'][0]]
     else:
         raise FileNotFoundError
 
