@@ -42,19 +42,24 @@ class Gaia_Search():
 
             print(i,'----{}%'.format(round(i/len(self.gaia_xmatch)*100, 2)))
 
-            catalog_data = Catalogs.query_object(gaia_id, catalog="Gaia", radius = r)
-            data = catalog_data.to_pandas()
             try:
-                data = data.loc[[0]]
-                data.insert(0, 'groups_index', i)
-                data.insert(1, 'input_id', gaia_id)
+                catalog_data = Catalogs.query_object(gaia_id, catalog="Gaia", radius = r)
+                data = catalog_data.to_pandas()
+                try:
+                    data = data.loc[[0]]
+                    data.insert(0, 'groups_index', i)
+                    data.insert(1, 'input_id', gaia_id)
 
-                self.gaia_info = pd.concat([self.gaia_info, data])
-                self.gaia_info = self.gaia_info.reset_index(drop = True)
+                    self.gaia_info = pd.concat([self.gaia_info, data])
+                    self.gaia_info = self.gaia_info.reset_index(drop = True)
+                except:
+                    # Save index of failed matches
+                    self.error.append(i) 
+                    print('Could not find a match')
+                    continue
             except:
-                # Save index of failed matches
                 self.error.append(i) 
-                print('Could not find a match')
+                print('No clue what happened...')
                 continue
         self.gaia_info.to_pickle('gaia-r0_01.pkl')
         np.save('err_r0_01.npy', self.error)
