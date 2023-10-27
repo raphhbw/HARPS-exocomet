@@ -12,6 +12,7 @@ All package dependencies can be found listed in `requirements.txt`.
 
 **How to run**
 ---
+If you have a folder with fits files corresponding to different stars, this is how we created our database:  
 _build-dataset_:  
 1. `metadata.py` - saves metadata from fits files in `fits` folder, using `GetData.py`
 2. `spectra.py` - saves spectra from fits files in `fits` folder for specified atomic line (CaII H & K lines), using `GetData.py`. +/- 2000 points from atomic line is saved
@@ -19,8 +20,10 @@ _build-dataset_:
 
 _groups_:  
 1.  `grouping.py` - group observed targets by 'reduced' name and coordinates  
-2.  `create_dataset.py` - create `dataset` folder with all the stars in subfolders with `reduced` name
+2.  `create_dataset.py` - create `dataset` folder with all the stars in subfolders with `reduced` name  
 
+
+Code that we used to generate our vetting plots use the following codes. Note these will need to be adjusted to your own database:  
 _HR_:  
 1. `Gaia.py` - get Gaia IDs and then query Gaia Catalogue to get information for HR diagram
 
