@@ -5,7 +5,8 @@ import numpy as np
 import os, sys
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
-plt.rcParams["font.size"] = "10"
+from matplotlib.lines import Line2D
+plt.rcParams["font.size"] = "11"
 
 from statistics import mode
 from matplotlib.ticker import AutoMinorLocator
@@ -132,6 +133,7 @@ while review_flagged == True:
 
             while Classifier.current_status == None:
 
+                # fig = plt.figure(constrained_layout=True, figsize=(14,15))
                 fig = plt.figure(constrained_layout=True, figsize=(10,10))
 
                 gs = GridSpec(8, 2, figure=fig)
@@ -151,7 +153,7 @@ while review_flagged == True:
 
                 ax1.axis('off')
                 try:
-                    table = ax1.table(cellText=simbad_search.values,colLabels=simbad_search.columns,loc='center', colWidths=[0.15, 0.35, 0.1, 0.15, 0.1, 0.1])
+                    table = ax1.table(cellText=simbad_search.values,colLabels=simbad_search.columns,loc='center', colWidths=[0.15, 0.4, 0.1, 0.15, 0.1, 0.1])
                     table.auto_set_font_size(False)
                     table.set_fontsize(10)
                 except:
@@ -163,7 +165,7 @@ while review_flagged == True:
                 ax2.set_ylabel('Normalised Flux')
                 ax2.set_xlabel('Heliocentric Velocity (km/s)')
                 ax2.set_xlim(Search.rv_min,Search.rv_max)
-                # ax2.set_ylim(top = 1.2, bottom=-0.1)
+                # ax2.set_ylim(top = 1., bottom=-0.2)
 
                 # ax3.set_xlim(Search.rv_min,Search.rv_max)
                 ax3.set_ylabel('SNR ($\sigma$)')
@@ -265,7 +267,8 @@ while review_flagged == True:
                     if detection == False:
                         ax4.scatter(rv_detect, min_detect, s=20, marker = 'o', color = 'grey', alpha = 0.5)
                         ax2.plot(Search.rv_K, corr_spec, linewidth = 2,alpha = 0.2, color ='grey',
-                            label='Superimposed spectra of {}'.format(Search.target_red) if i==0 else '', zorder = 0)
+                            # label='Superimposed spectra of {}'.format(Search.target_red) if i==0 else '',
+                              zorder = 0)
                         ax6.scatter(Classifier.target_info.loc[i , 'Date'], 1, s=20, marker = 'o', color = 'grey', 
                                     zorder = 0, alpha = 0.5)
                         ax3.plot(filtered_rv, sig, linewidth =1,color = 'grey', alpha= 0.3, zorder = 0)
@@ -273,11 +276,18 @@ while review_flagged == True:
                     # ax3.plot(filtered_rv, sig, linewidth =1) # only plots snr_idxrange
                     # ax3.plot(Search.rv_K, snr/sd, linewidth =1) # plots whole idxrange
     
-                ax2.plot(Search.rv_K, corr_med, linewidth = 2.5,color = 'r', label='Median reference spectrum', zorder = 10)
+                ax2.plot(Search.rv_K, corr_med, linewidth = 2.5,color = 'r', label='Median Reference', zorder = 10)
                 # ax2.fill_between(Search.rv_K, corr_med - med_err, corr_med + med_err, color='red', alpha=0.3)
                 if Search.ccf:
-                    ax2.plot(Search.rv_K, med, linewidth = 2.5,color = 'r', linestyle = '--', alpha =0.2, label='Original Median reference spectrum', zorder = 0)
-                ax2.legend()
+                    ax2.plot(Search.rv_K, med, linewidth = 2.5,color = 'r', linestyle = '--', alpha =0.2, label='Original Median Reference', zorder = 0)
+                
+                handles, labels = ax2.get_legend_handles_labels()
+
+                spectra_legend = Line2D([0], [0], label='Superimposed spectra', color='g', alpha=0.2)
+                spectra_det_legend = Line2D([0], [0], label='Spectra with detection', color='k')
+                # handles.append(jwst_sub6)
+                handles.extend([spectra_legend, spectra_det_legend])
+                ax2.legend(handles=handles, loc='upper center', fontsize=9)
 
                 Classifier.target_info['Min_SNR'] = all_min_SNR
                 Classifier.target_info['RV_pos'] = all_rv_pos
@@ -288,7 +298,8 @@ while review_flagged == True:
                 if plot == True:
 
                     if str(args.savefig) != 'None':
-                        plt.savefig(args.savefig + '{}.pdf'.format(cand), bbox_inches = 'tight')
+                        # plt.savefig(args.savefig + '{}.pdf'.format(cand), bbox_inches = 'tight', dpi=150)
+                        plt.savefig(args.savefig + '{}.png'.format(cand), bbox_inches = 'tight', dpi=150)
                         print(cand, 'saved!')
                         Classifier.current_status = 'saved' # Need to change status to get out of while loop
                         plt.close(fig)
@@ -326,7 +337,7 @@ while review_flagged == True:
             if save_path != None:
                 # TODO move already existing or remove already existing plot
                 print('{}: Saving fig...'.format(Search.target_red))
-                fig.savefig(save_path + '{}.png'.format(Search.target_red))
+                fig.savefig(save_path + '{}.png'.format(Search.target_red), dpi=150)
                 print('{}: Saved fig!'.format(Search.target_red))
             
             plt.close(fig)
