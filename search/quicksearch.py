@@ -16,6 +16,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='How to use QuickSearch', epilog='ASSET by RBW')
     parser.add_argument('--p', metavar='param.json', default='param.json', help='parameter file name (default:param.json)')
     parser.add_argument('--nice', metavar='niceness', default=15, help='niceness of job (default: 15)')
+    parser.add_argument('--r', metavar='res-path', default='../results/QuickSearch/', help='output path (default: ../results/QuickSearch/)')
+
     args = parser.parse_args()
 
     os.nice(int(args.nice))
@@ -43,9 +45,11 @@ if __name__ == '__main__':
 
     cands_file = 'candidates_{}sig_{}cut_{}width.npy'.format(Search.threshold, Search.cutoff, Search.width_filter)
 
-    # cands_file = 'old_noise_filtering.npy'
+    if not os.path.exists(args.r):
+        os.makedirs(args.r)
+        print("new directory {} created!".format(args.r))
 
-    np.save('../results/QuickSearch/' + cands_file, cands)
+    np.save(args.r + cands_file, cands)
 
     executionTime = (time.time() - startTime)
     print('Execution time in seconds: ' + str(executionTime))
