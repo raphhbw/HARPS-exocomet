@@ -16,6 +16,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='How to use QuickSearch', epilog='ASSET by RBW')
     parser.add_argument('--p', metavar='param.json', default='param.json', help='parameter file name (default:param.json)')
     parser.add_argument('--nice', metavar='niceness', default=15, help='niceness of job (default: 15)')
+    parser.add_argument('--line', metavar='line', default='K', help='define what atomic line to use (default: "K")')
     parser.add_argument('--r', metavar='res-path', default='../results/QuickSearch/', help='output path (default: ../results/QuickSearch/)')
 
     args = parser.parse_args()
@@ -30,7 +31,7 @@ if __name__ == '__main__':
     # print(len(dataset_path))
     # sys.exit()
 
-    Search = ASSET(param)
+    Search = ASSET(param, line=args.line)
 
     with multiprocessing.Pool(param["cores"]) as pool:
         out = pool.map(Search.quicksearch, dataset_path)
