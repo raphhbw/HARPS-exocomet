@@ -31,7 +31,7 @@ if __name__ == '__main__':
     # print(len(dataset_path))
     # sys.exit()
 
-    Search = ASSET(param, line=args.line)
+    Search = ASSET(parameters=param, line=args.line)
 
     with multiprocessing.Pool(param["cores"]) as pool:
         out = pool.map(Search.quicksearch, dataset_path)

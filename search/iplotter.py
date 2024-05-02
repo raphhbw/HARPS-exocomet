@@ -25,8 +25,10 @@ parser.add_argument('--p', metavar='param.json', default='param.json', help='par
 parser.add_argument('--star', metavar='star', default='None', help='Individual star you want to look at')
 parser.add_argument('--force', metavar='force_star', default='None', help='Force star you want to look at - input dataset name')
 parser.add_argument('--nice', metavar='niceness', default=15, help='niceness of job (default: 15)')
+parser.add_argument('--line', metavar='line', default='K', help='define what atomic line to use (default: "K")')
 parser.add_argument('--cands', metavar='review_cands', default='False', help='review previously flagged as candidates (default: False)')
 parser.add_argument('--r', metavar='res-path', default='../results/CandidateReport/', help='path for candidate report (default: CandidateReport/)')
+parser.add_argument('--idir', metavar='input-path', default='../results/QuickSearch/', help='path for numpy list of candidates from quicksearch.py (default: QuickSearch/)')
 parser.add_argument('--savefig', metavar='fig-path', default='None', help='path to save plots when running iplotter.py just for plots (default: None)')
 args = parser.parse_args()
 
@@ -51,11 +53,11 @@ elif str(args.force) != 'None':
 else:
     # Input candidate list
     if str(args.cands) == 'False':
-        candidates = np.load('../results/QuickSearch/candidates_-4sig_2cut_3width.npy', allow_pickle = True)
+        candidates = np.load(args.idir + 'candidates_{}sig_{}cut_{}width.npy'.format(param["threshold"], param["cutoff"], param["width_filt"]), allow_pickle = True)
     else:
         # review_cands = True
         # TODO load candidate numpy array
-        candidate_report = pd.read_pickle('../results/CandidateReport/candidate_report.pkl')
+        candidate_report = pd.read_pickle(args.r + 'candidate_report.pkl')
         all_candidates = candidate_report[candidate_report.Status == 'candidate']
         candidates = all_candidates.Target.to_numpy()
     # candidates = np.array(['hd172555', 'betapic', 'hr7596', 'hr4502', 'hr3702'])
@@ -65,7 +67,11 @@ else:
 # old_report = pd.read_pickle('CandidateReport/old_candidate_report.pkl')
 # newest_report = pd.read_pickle('CandidateReport2/candidate_report.pkl')
 
-Search = ASSET(param)
+if not os.path.exists(args.r):
+    os.makedirs(args.r)
+    print("new directory {} created!".format(args.r))
+
+Search = ASSET(parameters = param, line=args.line)
 HRd = HR_Diagram()
 Classifier = Classify(param, args.r)
 
@@ -120,13 +126,13 @@ while review_flagged == True:
                 else:
                     continue
             else:
-                new_sK, med, med_err = spec_param
-                ref_spec = med[Search.snr_idxrange_K]
+                new_spectra, med, med_err = spec_param
+                ref_spec = med[Search.snr_idxrange]
 
                 corr_med = med.copy()
                 if Search.ccf == True:
                     rv_shift = Search.X_corr(corr_med)
-                    cond100 = (Search.rv_K > rv_shift-50) & (Search.rv_K < rv_shift+50)
+                    cond100 = (Search.radial_velocity > rv_shift-50) & (Search.radial_velocity < rv_shift+50)
                     corr_med[cond100] = np.nan
 
                 Classifier.target_info = Search.df            
@@ -147,7 +153,7 @@ while review_flagged == True:
 
                 ax6 = fig.add_subplot(gs[7, :])
 
-                fig.suptitle("Star {}, Reduced: {}, Harps: {}".format(Search.target_san, Search.target_red, Search.target_harps))
+                fig.suptitle("{} line, Star {}, Reduced: {}, Harps: {}".format(args.line, Search.target_san, Search.target_red, Search.target_harps))
                 
                 simbad_search = get_otypes(Search.target_san)
 
@@ -203,18 +209,18 @@ while review_flagged == True:
                 # print(Classifier.target_info)
                 # print(new_sK.shape)
 
-                for i in range(len(new_sK)):
+                for i in range(len(new_spectra)):
 
                     detection = False
 
-                    spec = new_sK[i]
+                    spec = new_spectra[i]
 
                     corr_spec = spec.copy()
                     if Search.ccf:
                         corr_spec[cond100] = np.nan
 
-                    filtered_spec = spec[Search.snr_idxrange_K]
-                    snr = Search.snr(spec, med, Search.err_sK[i], med_err)
+                    filtered_spec = spec[Search.snr_idxrange]
+                    snr = Search.snr(spec, med, Search.spectra_err[i], med_err)
                         
                     sd = np.std(snr)
 
@@ -222,7 +228,7 @@ while review_flagged == True:
                     if Search.ccf == True:
                         corr_snr[cond100] = np.nan
 
-                    corr_snr = corr_snr[Search.snr_idxrange_K]
+                    corr_snr = corr_snr[Search.snr_idxrange]
 
                     # new_snr = snr[Search.snr_idxrange_K]
 
@@ -232,7 +238,7 @@ while review_flagged == True:
                     min_detect = np.nanmin(sig)
                     all_min_SNR.append(round(min_detect,2))
 
-                    filtered_rv = Search.rv_K[Search.snr_idxrange_K]
+                    filtered_rv = Search.radial_velocity[Search.snr_idxrange]
                     rv_detect = filtered_rv[sig == min_detect][0]
                     all_rv_pos.append(round(rv_detect,2))
 
@@ -252,7 +258,7 @@ while review_flagged == True:
                             # print(abs_depth)
                             all_abs_depth.append(round(abs_depth[0],2))
 
-                            ax2.plot(Search.rv_K, corr_spec, linewidth = 2,alpha = 0.7, 
+                            ax2.plot(Search.radial_velocity, corr_spec, linewidth = 2,alpha = 0.7, 
                                                     color ='k', zorder= 5)
 
                             # ax2.scatter(Search.rv_K, corr_spec, marker = '+', s=20,alpha = 0.7, 
@@ -266,7 +272,7 @@ while review_flagged == True:
 
                     if detection == False:
                         ax4.scatter(rv_detect, min_detect, s=20, marker = 'o', color = 'grey', alpha = 0.5)
-                        ax2.plot(Search.rv_K, corr_spec, linewidth = 2,alpha = 0.2, color ='grey',
+                        ax2.plot(Search.radial_velocity, corr_spec, linewidth = 2,alpha = 0.2, color ='grey',
                             # label='Superimposed spectra of {}'.format(Search.target_red) if i==0 else '',
                               zorder = 0)
                         ax6.scatter(Classifier.target_info.loc[i , 'Date'], 1, s=20, marker = 'o', color = 'grey', 
@@ -276,10 +282,10 @@ while review_flagged == True:
                     # ax3.plot(filtered_rv, sig, linewidth =1) # only plots snr_idxrange
                     # ax3.plot(Search.rv_K, snr/sd, linewidth =1) # plots whole idxrange
     
-                ax2.plot(Search.rv_K, corr_med, linewidth = 2.5,color = 'r', label='Median Reference', zorder = 10)
+                ax2.plot(Search.radial_velocity, corr_med, linewidth = 2.5,color = 'r', label='Median Reference', zorder = 10)
                 # ax2.fill_between(Search.rv_K, corr_med - med_err, corr_med + med_err, color='red', alpha=0.3)
                 if Search.ccf:
-                    ax2.plot(Search.rv_K, med, linewidth = 2.5,color = 'r', linestyle = '--', alpha =0.2, label='Original Median Reference', zorder = 0)
+                    ax2.plot(Search.radial_velocity, med, linewidth = 2.5,color = 'r', linestyle = '--', alpha =0.2, label='Original Median Reference', zorder = 0)
                 
                 handles, labels = ax2.get_legend_handles_labels()
 

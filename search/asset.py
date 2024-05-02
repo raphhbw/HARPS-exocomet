@@ -65,9 +65,9 @@ class ASSET():
             self.wavelength = np.load(star_path + 'wavelength/wK.npy')
             self.radial_velocity = np.load(star_path + 'wavelength/rvK.npy')
         elif self.line == 'H':
-            self.spectra = np.load(star_path+'spec/sK.npy')
-            self.wavelength = np.load(star_path + 'wavelength/wK.npy')
-            self.radial_velocity = np.load(star_path + 'wavelength/rvK.npy')
+            self.spectra = np.load(star_path+'spec/sH.npy')
+            self.wavelength = np.load(star_path + 'wavelength/wH.npy')
+            self.radial_velocity = np.load(star_path + 'wavelength/rvH.npy')
         else:
             return NotImplementedError
 
