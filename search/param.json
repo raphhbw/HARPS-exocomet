@@ -7,5 +7,5 @@
     "width_filt": 3,
     "dataset": "../HARPS-dataset/",
     "SNR_cut": 10,
-    "cores": 6
+    "cores": 4
 }
